@@ -9,6 +9,12 @@ public class ControlUnit {
     private int dddLoc;
     private int sssData;
     private int dddData;
+
+
+
+    private int operand1;
+    private int operand2;
+    private int destination;
     private int constantData;
 
 
@@ -173,12 +179,15 @@ public class ControlUnit {
         String ddd = modRM.substring(2,5);
         String sss = modRM.substring(5);
         int addressToConst;
+        int dddRegister;
+        int sssRegister;
 
         switch(mm){
             case "00":
             case "01":
             case "10":
                 //indexed mode
+                /*
                 dddLoc = getRegisterFromOpCode(ddd);
                 sssLoc = getRegisterFromOpCode(sss);
                 dddData = cpu.regValues[dddLoc];
@@ -186,6 +195,10 @@ public class ControlUnit {
                 addressToConst = Integer.parseInt(listingLine.substring(16,24), 16);
                 String constValueString = cpu.memory.listingLines.get(addressToConst);
                 constantData = Integer.parseInt(constValueString.substring(10,18), 16);
+                */
+
+                dddRegister = getRegisterFromOpCode(ddd);
+                sssRegister = getRegisterFromOpCode(sss);
                 return;
             case "11":
             default:
