@@ -4,9 +4,17 @@ public class ControlUnit {
     private CPU386 cpu;
     private ALU alu;
 
-    public ControlUnit(String listingLine, CPU386 cpu){
+
+    private int sssLoc;
+    private int dddLoc;
+    private int sssData;
+    private int dddData;
+    private int constantData;
+
+
+    ControlUnit(String listingLine, CPU386 cpu){
         this.listingLine = listingLine;
-        setFirstByteOpCode();
+        firstByteOpCode = hexStrToBinString(10,12);
         this.cpu = cpu;
         alu = new ALU();
     }
@@ -34,10 +42,10 @@ public class ControlUnit {
         }
     }
 
-    public void setFirstByteOpCode(){
-        String opCode = listingLine.substring(10,12);
-        int num = Integer.parseInt(opCode,16);
-        firstByteOpCode = Integer.toBinaryString(num);
+    public String hexStrToBinString(int start, int end){
+        String hexString = listingLine.substring(start,end);
+        int num = Integer.parseInt(hexString,16);
+        return Integer.toBinaryString(num);
     }
 
     public void determineAction(){
@@ -82,6 +90,8 @@ public class ControlUnit {
                 break;
             case "00100011":
                 System.out.println("AND reg, reg");
+                resolveModRM(hexStrToBinString(13,15));
+                // TO DO: PICK UP HERE!
                 break;
             case "11101000":
                 System.out.println("Call addr");
@@ -156,5 +166,30 @@ public class ControlUnit {
         }
         cpu.regValues[cpu.EIP] = memory.listingLines.higherKey(cpu.regValues[cpu.EIP]);
 
+    }
+
+    private void resolveModRM(String modRM){
+        String mm = modRM.substring(0,2);
+        String ddd = modRM.substring(2,5);
+        String sss = modRM.substring(5);
+        int addressToConst;
+
+        switch(mm){
+            case "00":
+            case "01":
+            case "10":
+                //indexed mode
+                dddLoc = getRegisterFromOpCode(ddd);
+                sssLoc = getRegisterFromOpCode(sss);
+                dddData = cpu.regValues[dddLoc];
+                sssData = cpu.regValues[sssLoc];
+                addressToConst = Integer.parseInt(listingLine.substring(16,24), 16);
+                String constValueString = cpu.memory.listingLines.get(addressToConst);
+                constantData = Integer.parseInt(constValueString.substring(10,18), 16);
+                return;
+            case "11":
+            default:
+                return;
+        }
     }
 }
